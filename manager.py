@@ -69,9 +69,9 @@ class NetworkManager:
 
             # train the model using Keras methods
             model.fit(X_train, y_train, batch_size=self.batchsize, epochs=self.epochs,
-                      verbose=1, validation_data=(X_val, y_val),
+                      verbose=2, validation_data=(X_val, y_val),
                       callbacks=[ModelCheckpoint('weights/temp_network.h5',
-                                                 monitor='val_acc', verbose=1,
+                                                 monitor='val_acc', verbose=2,
                                                  save_best_only=True,
                                                  save_weights_only=True)])
 

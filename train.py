@@ -10,12 +10,17 @@ from controller import Controller, StateSpace
 from manager import NetworkManager
 from model import model_fn
 
+import time
+from datetime import datetime
+
+import pdb
+
 # create a shared session between Keras and Tensorflow
 policy_sess = tf.Session()
 K.set_session(policy_sess)
 
 NUM_LAYERS = 4  # number of layers of the state space
-MAX_TRIALS = 250  # maximum number of models generated
+MAX_TRIALS = 25000  # maximum number of models generated
 
 MAX_EPOCHS = 10  # maximum number of epochs to train
 CHILD_BATCHSIZE = 128  # batchsize of the child models
@@ -48,6 +53,9 @@ dataset = [x_train, y_train, x_test, y_test]  # pack the dataset for the Network
 
 previous_acc = 0.0
 total_reward = 0.0
+
+csv_file_name = datetime.now().ctime() + '.csv'
+start_time = time.time()
 
 with policy_sess.as_default():
     # create the Controller and build the internal policy network
@@ -99,9 +107,10 @@ for trial in range(MAX_TRIALS):
         loss = controller.train_step()
         print("Trial %d: Controller loss : %0.6f" % (trial + 1, loss))
 
+        elapsed_time = time.time() - start_time
         # write the results of this trial into a file
-        with open('train_history.csv', mode='a+') as f:
-            data = [previous_acc, reward]
+        with open(csv_file_name, mode='a+') as f:
+            data = [elapsed_time, previous_acc, reward]
             data.extend(state_space.parse_state_space_list(state))
             writer = csv.writer(f)
             writer.writerow(data)
